@@ -1,0 +1,576 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf810
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red101\green76\blue29;\red0\green0\blue0;
+\red144\green1\blue18;}
+{\*\expandedcolortbl;;\csgenericrgb\c0\c0\c0;\cssrgb\c47451\c36863\c14902;\cssrgb\c0\c0\c0;
+\cssrgb\c63922\c8235\c8235;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww31960\viewh18740\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf2 - select:\
+	+ .select([*column])\
+	+ knex.select(\'91name\'92, \'91phone\'92, \'91email\'92).from(\'91warehouses\'92)	-> Outputs: select ` name`, `phone`, `email` from `warehouses`\
+	   kenx.select().from(`warehouses`)	-> Outputs: select * from `warehouses`\
+\
+\
+- as:\
+	+ .as(name)\
+	+ knex.sum(\'91sum_employee as sum\'92).from(\'91warehouses\'92).as(\'92sum\'92) -> Outputs: select sum(`sum_employee`) as `sum` from `warehouses`\
+\
+\
+- column:\
+	+ .column(columns)\
+	+ knex.column(\'91name\'92, \'91email\'92, \'91phone\'92).select().from(\'91warehouses\'92) -> Outputs: select `name`, `email`, `phone` from `warehouses`\
+	   knex.column([\'91name\'92, \'91email\'92, \'91phone\'92]).select().from(\'91warehouses\'92) -> Outputs: select `name`, `email`, `phone` from `warehouses`\
+	   knex.column(\'91name\'92, \'91email\'92, \{phone_number: \'91phone\'92\}).select().from(\'91warehouses\'92) -> Outputs: select `name`, `email`, `phone` as `phone_number` from `warehouses\
+\
+\
+- from:\
+	+ .from([tableName])\
+	+ knex.select().from(\'91warehouses\'92) 	-> Outputs: select * from `warehouses`\
+	   knex.select().from([\'91warehouses\'92, \'91employees\'92]) 	-> Outputs: select * from `warehouses`, `employees`\
+\
+\
+- with: not supported mysql\
+\
+\
+\pard\pardeftab720\sl360\partightenfactor0
+\cf2 \expnd0\expndtw0\kerning0
+	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************\kerning1\expnd0\expndtw0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf2 * WHERE METHODS\
+- where:\
+	+ .where(~mixed~)\
+	+ Object Syntax: knex(\'91warehouses\'92).where(\{address: \'92125 TX\'92, sum_employee: \'916\'92\}).select(\'91name\'92) -> Outputs: select `name` from `warehouses` where `address` = \'91125 TX\'92 and `sum_employee` = 6\
+	+ Key, Value: knex(\'91warehouses\'92).where(\'91id\'92, 1)	-> Outputs: select * from `warehouses` where `id` = 1\
+	+ Functions: knex.select().from(\'91warehouses\'92).where((builder) => \{ builder.where(\'91name\'92, \'91TX1\'92) \}) -> Outputs: select * from `warehouses` where `name` = \'91TX1\'92\
+	+ Grouped chain: knex(\'91warehouses\'92).where(function() \{ this.where(\'91warehouse_id\'92, 1).orWhere(\'92sum_employee\'92, \'91>\'92, 4) \}).andWhere(\'91name\'92, \'91like\'92, \'91%X1%\'92) -> Outputs: select * from `warehouses` where (`warehouse_id` = 1 or `sum_employee` > 4) and `name` like \'91%X1%\'92\
+	+ Operator: knex(\'91warehouses\'92).where(\'91name\'92, \'91like\'92, \'91%X1%\'92) -> Outputs: select * from `warehouses` where `name` like \'91%X1\'92\
+			  knex(\'91warehouses\'92).where(\'91sum_employee\'92, \'91>\'92, 4) -> Outputs: select * from `warehouses` where `sum_employee` > 4\
+			  knex(\'91warehouses\'92).where(\'91warehouse_id\'92, \'91not in\'92, [1, 2]) -> Outputs: select * from `warehouses` where `warehouse_id` not in (1, 2)\
+\
+- whereNot:\
+	+ .whereNot(~mixed~)\
+	+ Object Syntax: knex(\'91warehouses\'92).whereNot(\{address: \'92125 TX\'92, sum_employee: \'916\'92\}).select(\'91name\'92) -> Outputs: select `name` from `warehouses` where not `address` = \'91125 TX\'92 and not `sum_employee` = 6\
+	+ Key, Value: knex(\'91warehouses\'92).whereNot(\'91id\'92, 1)	-> Outputs: select * from `warehouses` where not `id` = 1\
+	+ Grouped chain: knex(\'91warehouses\'92).whereNot(function() \{ this.where(\'91warehouse_id\'92, 1).orWhereNot(\'92sum_employee\'92, \'91>\'92, 4) \}).andWhereNot(\'91name\'92, \'91like\'92, \'91%X1%\'92) -> Outputs: select * from `warehouses` where not (`warehouse_id` = 1 or not `sum_employee` > 4) and not `name` like \'91%X1%\'92\
+	+ Operator: knex(\'91warehouses\'92).whereNot(\'91sum_employee\'92, \'91>\'92, 4) -> Outputs: select * from `warehouses` where not `sum_employee` > 4\
+			  knex(\'91warehouses\'92).whereNot(\'91warehouse_id\'92, \'91not in\'92, [1, 2]) -> Outputs: select * from `warehouses` where not `warehouse_id` not in (1, 2)\
+\
+\
+- whereIn:\
+	+ \expnd0\expndtw0\kerning0
+.whereIn(column|columns, array|callback|builder) / .orWhereIn\kerning1\expnd0\expndtw0 \
+	+ \expnd0\expndtw0\kerning0
+knex.select(\'91name\'92).from(\'91warehouses\'92).whereIn(\'91warehouse_id\'92, [1, 2]).orWhereIn(\'91warehouse_id\'92, [4, 5])\kerning1\expnd0\expndtw0  -> Outputs: \expnd0\expndtw0\kerning0
+select `name` from `warehouses` where `warehouse_id` in (1, 2) or `warehouse_id` in (4, 5)\kerning1\expnd0\expndtw0 \
+	+ \expnd0\expndtw0\kerning0
+knex.select(\'91name\'92).from(\'91warehouses\'92).whereIn(\'91warehouse_id\'92, function() \{this.select(\'91warehouse_id\'92).from(\'91employees\'92)\}) \kerning1\expnd0\expndtw0 -> Outputs: select `name` from `warehouses` where `warehouse_id` in (select `warehouse_id` from `employees`)\
+	+ \expnd0\expndtw0\kerning0
+knex.select('name').from(\'91warehouses\'92).whereIn(\'91warehouse_id\'92, knex.select(\'91warehouse_id\'92).from(\'91employees\'92)) \kerning1\expnd0\expndtw0 -> Outputs: select `name` from `warehouses` where `warehouse_id` in (select `warehouse_id` from `employees`)\
+	+ \expnd0\expndtw0\kerning0
+knex.select(\'91name\'92).from(\'91warehouses\'92).whereIn([\'91warehouse_id\'92, \'91email\'92], [[1, \'91TX1@gmail.com\'92], [4, \'91TX4@gmail.com\'92]])\kerning1\expnd0\expndtw0  -> Outputs: select `name` from `warehouses` where (`warehouse_id`, `email`) in ((1, \'91TX1@gmail.com\'92), (4, \'91TX4@gmail.com\'92))\
+\
+\
+- whereNotIn:\
+	+ \expnd0\expndtw0\kerning0
+.whereNotIn(column|columns, array|callback|builder) / .orWhereNotIn\kerning1\expnd0\expndtw0 \
+	+ \expnd0\expndtw0\kerning0
+knex(\'91warehouses\'92).whereNotIn(\'91warehouse_id\'92, [1, 2, 3])\kerning1\expnd0\expndtw0  -> Outputs: \expnd0\expndtw0\kerning0
+select * from `warehouses` where `warehouse_id` not in (1, 2, 3)\kerning1\expnd0\expndtw0 \
+	+ \expnd0\expndtw0\kerning0
+knex(\'91warehouses\'92).where('name', 'like', \'91%TX1%\'92).orWhereNotIn(\'91warehouse_id\'92, [1, 3]) \kerning1\expnd0\expndtw0 -> Outputs: \expnd0\expndtw0\kerning0
+select * from `warehouses` where `name` like '% TX1%' or `warehouse_id` not in (1, 3)\
+\
+\
+\kerning1\expnd0\expndtw0 - whereNull:\
+	+ \expnd0\expndtw0\kerning0
+.whereNull(column) / .orWhereNull\kerning1\expnd0\expndtw0 \
+	+ \expnd0\expndtw0\kerning0
+knex(\'91warehouses\'92).whereNull(\'91address\'92)\kerning1\expnd0\expndtw0  -> Outputs: \expnd0\expndtw0\kerning0
+select * from `warehouses` where `address` is null\
+\
+\
+\kerning1\expnd0\expndtw0 - whereNotNull:\
+	+ \expnd0\expndtw0\kerning0
+.whereNotNull(column) / .orWhereNotNull\kerning1\expnd0\expndtw0 \
+	+ \expnd0\expndtw0\kerning0
+knex(\'91warehouses\'92).whereNotNull(\'91address\'92)\kerning1\expnd0\expndtw0  -> Outputs: \expnd0\expndtw0\kerning0
+select * from `warehouses` where `address` is not null\
+\
+\
+\kerning1\expnd0\expndtw0 - whereExists:\
+	+ \expnd0\expndtw0\kerning0
+.whereExists(builder | callback) / .orWhereExists\kerning1\expnd0\expndtw0 \
+	+ \expnd0\expndtw0\kerning0
+knex(\'91warehouses\'92).whereExists(function() \{this.select().from(\'91employees\'92).whereRaw(\'91warehouses.warehouse_id = employees.warehouse_id\'92)\})\kerning1\expnd0\expndtw0  -> Outputs: \expnd0\expndtw0\kerning0
+select * from `warehouses` where exists (select * from `employees` where warehouses.warehouse_id = employees.warehouse_id)\
+	+ knex('warehouses').whereExists(knex.select().from('employees').whereRaw('warehouses.warehouse_id = employees.warehouse_id')) -> \kerning1\expnd0\expndtw0 Outputs: \expnd0\expndtw0\kerning0
+select * from `warehouses` where exists (select * from `employees` where warehouses.warehouse_id = employees.warehouse_id)\
+\
+\
+\kerning1\expnd0\expndtw0 - whereNotExists:\
+	+ \expnd0\expndtw0\kerning0
+.whereNotExists(builder | callback) / .orWhereNotExists\kerning1\expnd0\expndtw0 \
+	+ \expnd0\expndtw0\kerning0
+knex(\'91warehouses\'92).whereNotExists(function() \{this.select().from(\'91employees\'92).whereRaw(\'91warehouses.warehouse_id = employees.warehouse_id\'92)\})\kerning1\expnd0\expndtw0  -> Outputs: \expnd0\expndtw0\kerning0
+select * from `warehouses` where not exists (select * from `employees` where warehouses.warehouse_id = employees.warehouse_id)\
+	+ knex('warehouses').whereNotExists(knex.select().from('employees').whereRaw('warehouses.warehouse_id = employees.warehouse_id')) -> \kerning1\expnd0\expndtw0 Outputs: \expnd0\expndtw0\kerning0
+select * from `warehouses` where not exists (select * from `employees` where warehouses.warehouse_id = employees.warehouse_id)\
+\
+\
+\kerning1\expnd0\expndtw0 - whereBetween:\
+	+ \expnd0\expndtw0\kerning0
+.whereBetween(column, range) / .orWhereBetween\kerning1\expnd0\expndtw0 \
+	+ \expnd0\expndtw0\kerning0
+knex(\'91warehouses\'92).whereBetween(\'91sum_employee\'92, [1, 4])\kerning1\expnd0\expndtw0  -> Outputs: select * from `warehouses` where `sum_employee` between 1 and 4\
+\
+\
+- whereNotBetween:\
+	+ \expnd0\expndtw0\kerning0
+.whereNotBetween(column, range) / .orWhereNotBetween\kerning1\expnd0\expndtw0 \
+	+ \expnd0\expndtw0\kerning0
+knex(\'91warehouses\'92).whereNotBetween(\'91sum_employee\'92, [1, 4])\kerning1\expnd0\expndtw0  -> Outputs: select * from `warehouses` where `sum_employee` not between 1 and 4\
+\
+\
+- whereRaw:\
+	+ \expnd0\expndtw0\kerning0
+.whereRaw(query, [bindings])\kerning1\expnd0\expndtw0 \
+	+ \expnd0\expndtw0\kerning0
+knex(\'91warehouses\'92).whereRaw(\'91warehouse_id = ?\'92, [1])\kerning1\expnd0\expndtw0  -> Outputs: \expnd0\expndtw0\kerning0
+select * from `warehouses` where `warehouse_id` = 1\
+\
+\
+\pard\pardeftab720\sl360\partightenfactor0
+\cf2 	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf2 * JOIN METHODS\
+- join:\
+	+ .join(table, first, [operator], second)\
+	+ knex(\'91warehouses\'92).join(\'91employees\'92, \'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92).select(\'91warehouses.warehouse_id\'92, \'91employees.name\'92) -> Outputs: select `warehouses`.`warehouse_id`, `employees`.`name` from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id`\
+	+ knex.select().from(\'91warehouses\'92).join(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92).andOn(\'91warehouses.sum_employee\'92, 4)\}) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`sum_employee` = 4\
+	+ knex.select().from(\'91warehouses\'92).join(\'91employees\'92, function() \{\
+\pard\pardeftab720\sl360\partightenfactor0
+\cf2     this.on(function() \{\
+      this.on(\'91warehouses.warehouse_id\'92,\'92employees.warehouse_id\'92)\
+      this.andOn(\'91warehouses.sum_employee\'92, 4)\
+    \})\
+  \})\
+	-> Outputs: select * from `warehouses` inner join `employees` on (`warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`sum_employee` = 4)\
+	+ knex.select().from(\'91warehouses\'92).join(\'91employees\'92, \{\'91warehouses.warehouse_id\'92: \'91employees.warehouse_id\'92\}) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id`\
+	+ knex.select().from(\'91warehouses\'92).join(\'91employees\'92, \'91warehouses.sum_employee\'92, knex.raw(\'91?\'92, [4])) -> Output: select * from `warehouses` inner join `employees` on `warehouses`.`sum_employee` = 4\
+	+ joining multiple tables: \cf2 \outl0\strokewidth0 \strokec3 knex\strokec4 (\strokec5 \'91warehouses\'92\strokec4 ).\strokec3 join\strokec4 (\strokec5 \'91employees\'92\strokec4 , \strokec5 \'91warehouses.warehouse_id\'92\strokec4 , \strokec5 \'91employees.warehouse_id\'92\strokec4 ).\strokec3 join\strokec4 (\strokec5 \'91contacts\'92\strokec4 , \strokec5 \'91employees.employee_id\'92\strokec4 , \strokec5 \'91contacts.employee_id\'92\strokec4 ) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` inner join `contacts` on `employees`.`employee_id` = `contacts`.`employee_id`\cf2 \outl0\strokewidth0 \
+\
+\
+- innerJoin:\
+	+ .innerJoin(table, ~mixed~)\
+	+ knex.from(\'91warehouses\'92).innerJoin(\'91employees\'92, \'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id`\
+	+ knex(\'91warehouses\'92).innerJoin(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92).andOn(\'91warehouses.sum_employee\'92, 4)\}) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`sum_employee` = 4\
+\
+\
+- leftJoin:\
+	+ .leftJoin(table, ~mixed~)\
+	+ knex.from(\'91warehouses\'92).leftJoin(\'91employees\'92, \'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92) -> Outputs: select * from `warehouses` left join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id`\
+	+ knex(\'91warehouses\'92).leftJoin(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92).andOn(\'91warehouses.sum_employee\'92, 4)\}) -> Outputs: select * from `warehouses` left join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`sum_employee` = 4\
+\
+\
+- leftOuterJoin:\
+	+ .leftOuterJoin(table, ~mixed~)\
+	+ knex.from(\'91warehouses\'92).leftOuterJoin(\'91employees\'92, \'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92) -> Outputs: select * from `warehouses` left outer join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id`\
+	+ knex(\'91warehouses\'92).leftOuterJoin(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92).andOn(\'91warehouses.sum_employee\'92, 4)\}) -> Outputs: select * from `warehouses` left outer join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`sum_employee` = 4\
+\
+\
+- rightJoin:\
+	+ . rightJoin(table, ~mixed~)\
+	+ knex.from(\'91warehouses\'92). rightJoin(\'91employees\'92, \'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92) -> Outputs: select * from `warehouses` right join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id`\
+	+ knex(\'91warehouses\'92). rightJoin(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92).andOn(\'91warehouses.sum_employee\'92, 4)\}) -> Outputs: select * from `warehouses` right join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`sum_employee` = 4\
+\
+\
+- rightOuterJoin:\
+	+ . rightOuterJoin(table, ~mixed~)\
+	+ knex.from(\'91warehouses\'92). rightOuterJoin(\'91employees\'92, \'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92) -> Outputs: select * from `warehouses` right outer join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id`\
+	+ knex(\'91warehouses\'92). rightOuterJoin(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92).andOn(\'91warehouses.sum_employee\'92, 4)\}) -> Outputs: select * from `warehouses` right outer join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`sum_employee` = 4\
+\
+\
+- fullOuterJoin: not supported mysql\
+\
+\
+- crossJoin:\
+	+ .crossJoin(table, ~mixed~)\
+	+ knex.select().from(\'91warehouses\'92).crossJoin(\'91employees\'92) -> Outputs: select * from `warehouses` cross join `employees`\
+	+ knex.from(\'91warehouses\'92). crossJoin(\'91employees\'92, \'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92) -> Outputs: select * from `warehouses` cross join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id`\
+	+ knex(\'91warehouses\'92). crossJoin(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92).andOn(\'91warehouses.sum_employee\'92, 4)\}) -> Outputs: select * from `warehouses` cross join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`sum_employee` = 4\
+\
+\
+	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************\
+* ON METHODS\
+- onIn\
+	+ .onIn(column, values)\
+	+ knex.select().from(\'91warehouses\'92).join(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'92employees.warehouse_id\'92).onIn(\'91warehouses.warehouse_id\'92, [1, 3])\}) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`warehouse_id` in (1, 3)\
+\
+\
+- onNotIn\
+	+ .onNotIn(column, values)\
+	+ knex.select().from(\'91warehouses\'92).join(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'92employees.warehouse_id\'92).onNotIn(\'91warehouses.warehouse_id\'92, [1, 3])\}) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`warehouse_id` not in (1, 3)\
+\
+\
+-onNull\
+	+ .onNull(column)\
+	+ knex.select().from(\'91warehouses\'92).join(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92,\'92employees.warehouse_id\'92).onNull(\'91warehouses.email\'92)\}) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`email` is null\
+\
+\
+-onNotNull\
+	+ .onNotNull(column)\
+	+ knex.select().from(\'91warehouses\'92).join(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92,\'92employees.warehouse_id\'92).onNotNull(\'91warehouses.email\'92)\}) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`email` is not null\
+\
+\
+- onExists:\
+	+ .onExists(builder | callback)\
+	+ knex.select().from(\'91warehouses\'92).join(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92).onExists(function() \{this.select().from(\'91contacts\'92).whereRaw(\'91employees.employee_id = contacts.employee_id\'92)\})\}) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and exists (select * from `contacts` where employees.employee_id = contacts.employee_id)\
+\
+\
+- onNotExists:\
+	+ .onNotExists(builder | callback)\
+	+ knex.select().from(\'91warehouses\'92).join(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92).onExists(function() \{this.select().from(\'91contacts\'92).whereRaw(\'91employees.employee_id = contacts.employee_id\'92)\})\}) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and not exists (select * from `contacts` where employees.employee_id = contacts.employee_id)\
+\
+\
+- onBetween:\
+	+ .onBetween(column, range)\
+	+ knex.select().from(\'91warehouses\'92).join(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92).onBetween(\'91warehouses.warehouse_id\'92, [2, 4])\}) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`warehouse_id` between 2 and 4\
+\
+\
+- onNotBetween:\
+	+ .onNotBetween(column, range)\
+	+ knex.select().from(\'91warehouses\'92).join(\'91employees\'92, function() \{this.on(\'91warehouses.warehouse_id\'92, \'91employees.warehouse_id\'92).onNotBetween(\'91warehouses.warehouse_id\'92, [2, 4])\}) -> Outputs: select * from `warehouses` inner join `employees` on `warehouses`.`warehouse_id` = `employees`.`warehouse_id` and `warehouses`.`warehouse_id` not between 2 and 4\
+\
+\
+	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************\
+* HAVING METHODS\
+- having: \
+	+ .having(column, operator, value)\
+	+ knex.select(\'91name\'92).from(\'91warehouses\'92).groupBy(\'91name\'92).having(\'91name\'92, \'91like\'92, \'91%X1\'92) -> Outputs: select `name` from `warehouses` group by `name` having `name` like \'91%X1\'92\
+\
+\
+- havingIn\
+	+ .havingIn(column, values)\
+	+ knex.select(\'91name\'92).from(\'91warehouses\'92).groupBy(\'91name\'92).havingIn(\'91name\'92, [\'91TX1\'92, \'91TX4\'92]) -> Outputs: select `name` from `warehouses` group by `name` having `name` in (\'91TX1\'92, \'91TX4\'92)\
+\
+\
+- havingNotIn\
+	+ .havingNotIn(column, values)\
+	+ knex.select(\'91name\'92).from(\'91warehouses\'92).groupBy(\'91name\'92).havingNotIn(\'91name\'92, [\'91TX1\'92, \'91TX4\'92]) -> Outputs: select `name` from `warehouses` group by `name` having `name` not in (\'91TX1\'92, \'91TX4\'92)\
+\
+\
+- havingNull\
+	+ .havingNull(column)\
+	+ knex.select(\'91name\'92, \'91email\'92).from(\'91warehouses\'92).groupBy(\'91name\'92, \'91email\'92). havingNull(\'91email\'92) -> Outputs: select `name`, `email` from `warehouses` group by `name`, `email` having `email` is null\
+\
+\
+- havingNotNull\
+	+ .havingNotNull(column)\
+	+ knex.select(\'91name\'92, \'91email\'92).from(\'91warehouses\'92).groupBy(\'91name\'92, \'91email\'92). havingNotNull(\'91email\'92) -> Outputs: select `name`, `email` from `warehouses` group by `name`, `email` having `email` is not null\
+\
+\
+- havingExists\
+	+ .havingExists(builder | callback)\
+	+ knex.select().from(\'91warehouses\'92).havingExists(function() \{this.select().from(\'91employees\'92).whereRaw(\'91warehouses.warehouse_id = employees.warehouse_id\'92)\}) -> Outputs: select * from `warehouses` having exists (select * from `employees` where warehouses.warehouse_id = employees.warehouse_id)\
+\
+\
+- havingNotExists\
+	+ .havingNotExists(builder | callback)\
+	+ knex.select().from(\'91warehouses\'92).havingNotExists(function() \{this.select().from(\'91employees\'92).whereRaw(\'91warehouses.warehouse_id = employees.warehouse_id\'92)\}) -> Outputs: select * from `warehouses` having not exists (select * from `employees` where warehouses.warehouse_id = employees.warehouse_id)\
+\
+\
+- havingBetween\
+	+ .havingBetween(column, range)\
+	+ knex.select().from(\'91warehouses\'92).havingBetween(\'91warehouse_id\'92, [1, 3]) -> Outputs: select * from `warehouses` having `warehouse_id` between 1 and 3\
+\
+\
+- havingNotBetween\
+	+ .havingNotBetween(column, range)\
+	+ knex.select().from(\'91warehouses\'92).havingNotBetween(\'91warehouse_id\'92, [1, 3]) -> Outputs: select * from `warehouses` having `warehouse_id` not between 1 and 3\
+\
+\
+- havingRaw\
+	+ .havingRaw(column, operator, value)\
+	+ knex.select(\'91name\'92).from(\'91warehouses\'92).groupBy(\'91name\'92).havingRaw(\'91name like ?\'92, [\'91%X1\'92]) -> Outputs: select `name` from `warehouses` group by `name` having name like \'91%X1\'92\
+\
+\
+	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************\
+- clearSelect:\
+	+ .clearSelect()\
+	+ knex.select(\'91name\'92, \'91email\'92).from(\'91warehouses\'92).clearSelect() -> Outputs: select * from `warehouses`\
+\
+\
+- clearWhere:\
+	+ .clearWhere()\
+	+ knex.select(\'91name\'92, \'91email\'92).from(\'91warehouses\'92).where(\'91warehouse_id\'92, 1).clearSelect() -> Outputs: select `name`, `email` from `warehouses`\
+\
+\
+- clearOrder:\
+	+ .clearOrder()\
+	+ knex.select().from(\'91warehouses\'92)orderBy(\'91name\'92, \'91desc\'92).clearOrder() -> Outputs: select * from `warehouses`\
+\
+\
+- distinct:\
+	+ .distinct()\
+	+ knex(\'91warehouses\'92).distinct(\'91name\'92) -> Outputs: select distinct `name` from `warehouses`\
+\
+\
+- groupBy:\
+	+ groupBy(*names)\
+	+ knex.select(\'91name\'92).from(\'91warehouses\'92).groupBy(\'91name\'92) -> Outputs: select `name` from `warehouses` group  by`name`\
+\
+\
+- groupByRaw:\
+	+ groupByRaw(sql)\
+	+ knex.select(\'91name\'92, knex.raw(\'91SUM(sum_employee)\'92)).from(\'91warehouses\'92).groupByRaw(\'91name WITH ROLLUP\'92) -> Outputs: select `name`, SUM(sum_employee) from `warehouses` group by name WITH ROLLUP\
+\
+\
+- orderBy:\
+	+ orderBy(column, [direction])\
+	+ knex(\'91warehouses\'92).orderBy(\'91name\'92, \'91desc\'92) -> Outputs: select * from `warehouses` order  by `name` desc\
+\
+\
+- orderByRaw:\
+	+ orderByRaw(sql)\
+	+ knex(\'91warehouses\'92).orderByRaw(\'91name DESC\'92) -> Outputs: select * from `warehouses` order  by name DESC\
+\
+\
+- offset:\
+	+ .offset(value)\
+	+ knex(\'91warehouses\'92).offset(3) -> Outputs: select * from `warehouses` limit 18446744073709551615 offset 3\
+\
+\
+- limit:\
+	+ . limit(value)\
+	+ knex(\'91warehouses\'92). limit(3) -> Outputs: select * from `warehouses` limit 3\
+\
+\
+- union:\
+	+ .union(*[queries], [wrap])\
+	+ knex.select().from(\'91warehouses\'92).whereNull(\'91phone\'92).union(function() \{this.select().from(\'91warehouses\'92).whereNull(\'91email\'92)\}) -> Outputs: select * from `warehouses` where `phone` is null union select * from `warehouses` where `email` is null\
+\
+\
+- unionAll:\
+	+ .unionAll(query)\
+	+ knex.select().from(\'91warehouses\'92).whereNull(\'91phone\'92).unionAll(function() \{this.select().from(\'91warehouses\'92).whereNull(\'91email\'92)\}) -> Outputs: select * from `warehouses` where `phone` is null union all select * from `warehouses` where `email` is null\
+\
+\
+- insert:\
+	+ .insert(data, [returning])\
+	+ knex(\'91warehouses\'92).insert(\{name: \'91TXn\'92\}) -> Outputs: insert into `warehouses` (`name`) values (\'91TXn\'92)\
+	  knex(\'91warehouses\'92).insert([\{name: \'91TXm\'92, address: \'91123 TXm\'92\}, \{name: \'91TXp\'92\}]) -> Outputs: insert into `warehouse` (`name`, `address`) values (\'91TXm\'92, \'91123 TXm\'92) (\'91TXp\'92, DEFAULT)\
+\
+\
+- update:\
+	+ .update(data, [returning]) / .update(key, value, [returning])\
+	+ knex(\'91warehouses\'92).where(\'91name\'92, \'91TXp\'92).update(\{email: \'91TXp@gmail.com\'92, sum_employee: 6\}) -> Outputs: update `warehouses` set `email` = \'91TXp@gmail.com\'92, `sum_employee` = 6 where `name` = \'92TXp\'92\
+	  knex(\'91warehouses\'92).update(\'91address\'92, \'91123 TXs\'92) -> Outputs: update `warehouses` set `address` = \'91123 TXs\'92\
+\
+\
+- del/delete\
+	+ .del()\
+	+ knex(\'91warehouses\'92).where(\'91name\'92, \'91TXp\'92).del() -> Outputs: delete from `warehouses` where `name` = \'92TXp\'92\
+\
+\
+- count:\
+	+ .count(column|columns|raw)\
+	+ knex.(\'91warehouses\'92).count(\'91name\'92) -> Outputs: select count(`name`) from `warehouses`\
+	+ knex.(\'91warehouses\'92).count(\'91name as n\'92) -> Outputs: select count(`name`) as `n` from `warehouses`\
+	+ knex.(\'91warehouses\'92).count(\{n: \'91name\'92\}) -> Outputs: select count(`name`) as `n` from `warehouses`\
+	+ knex.(\'91warehouses\'92).count(\'91warehouse_id\'92, \'91name\'92) -> Outputs: select count(`warehouse_id`) from `warehouses`\
+	+ knex.(\'91warehouses\'92).count(knew.raw(\'91??\'92, [\'91name\'92])) -> Outputs: select count(`name`) from `warehouses`\
+	+ countDistinct: knex(\'91warehouses\'92).countDistinct(\'91name\'92) -> Outputs: select count(distinct `name`) from `warehouses`\
+\
+\
+- min:\
+	+ .min(column|columns|raw)\
+	+ knex.(\'91warehouses\'92).min(\'91sum_employee\'92) -> Outputs: select min(`sum_employee`) from `warehouses`\
+	+ knex.(\'91warehouses\'92).min(\'91sum_employee as s\'92) -> Outputs: select min(`sum_employee`) as `s` from `warehouses`\
+	+ knex.(\'91warehouses\'92).min(\{s: \'91sum_employee\'92\}) -> Outputs: select min(`sum_employee`) as `s` from `warehouses`\
+	+ knex.(\'91warehouses\'92).min(\'91sum_employee\'92, \'91quantity\'92) -> Outputs: select min(`sum_employee`) from `warehouses`\
+	+ knex.(\'91warehouses\'92).min(knew.raw(\'91??\'92, [\'91sum_employee\'92])) -> Outputs: select min(`sum_employee`) from `warehouses`\
+\
+\
+- max:\
+	+ .max(column|columns|raw)\
+	+ knex.(\'91warehouses\'92).max(\'91sum_employee\'92) -> Outputs: select max(`sum_employee`) from `warehouses`\
+	+ knex.(\'91warehouses\'92).max(\'91sum_employee as s\'92) -> Outputs: select max(`sum_employee`) as `s` from `warehouses`\
+	+ knex.(\'91warehouses\'92).max(\{s: \'91sum_employee\'92\}) -> Outputs: select max(`sum_employee`) as `s` from `warehouses`\
+	+ knex.(\'91warehouses\'92).max(\'91sum_employee\'92, \'91quantity\'92) -> Outputs: select max(`sum_employee`) from `warehouses`\
+	+ knex.(\'91warehouses\'92).max(knew.raw(\'91??\'92, [\'91sum_employee\'92])) -> Outputs: select max(`sum_employee`) from `warehouses`\
+\
+\
+- avg:\
+	+ .avg(column|columns|raw)\
+	+ knex.(\'91warehouses\'92).avg(\'91sum_employee\'92) -> Outputs: select avg(`sum_employee`) from `warehouses`\
+	+ knex.(\'91warehouses\'92).avg(\'91sum_employee as s\'92) -> Outputs: select avg(`sum_employee`) as `s` from `warehouses`\
+	+ knex.(\'91warehouses\'92).avg(\{s: \'91sum_employee\'92\}) -> Outputs: select avg(`sum_employee`) as `s` from `warehouses`\
+	+ knex.(\'91warehouses\'92).avg(\'91sum_employee\'92, \'91quantity\'92) -> Outputs: select avg(`sum_employee`) from `warehouses`\
+	+ knex.(\'91warehouses\'92).avg(knew.raw(\'91??\'92, [\'91sum_employee\'92])) -> Outputs: select avg(`sum_employee`) from `warehouses\
+	+ avgDistinct: knex(\'91warehouses\'92).avgDistinct(\'91sum_employee\'92) -> Outputs: select avg(distinct `sum_employee`) from `warehouses`\
+\
+\
+_increment:\
+	+ .increment(column, amount)\
+	+ knex(\'91warehouses\'92).where(\'91warehouse_id\'92, 1).increment(\'91sum_employee\'92, 3) -> Outputs: update `warehouses` set `sum_employee` = `sum_employee` + 3 where `warehouse_id` = 3\
+\
+\
+_decrement:\
+	+ .decrement(column, amount)\
+	+ knex(\'91warehouses\'92).where(\'91warehouse_id\'92, 1).decrement(\'91sum_employee\'92, 3) -> Outputs: update `warehouses` set `sum_employee` = `sum_employee` - 3 where `warehouse_id` = 3\
+\
+\
+	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************	***************************\
+SCHEMA BUILDER\
+- withSchema:\
+	+ knex.schema.withSchema([schemaName])\
+	+\
+		knex.schema.withSchema(\'91test\'92).createTable(\'91warehouses\'92, function (table) \{\
+			table.increments()\
+		\}) -> Outputs: create table `test`.`warehouses` (`id` int unsigned not null auto_increment primary key)\
+\
+\
+- createTable:\
+	+ knex.schema.createTable(tableName, callback)\
+	+\
+		knex.schema.createTable(\'91warehouses\'92, function (table) \{\
+			table.increments()\
+			table.string('name')\
+		\}) -> Output: create table `warehouse` (`id` int unsigned not null auto_increment primary key, `name` varchar(255))\
+\
+\
+- renameTable:\
+	+ knex.schema.renameTable(from, to)\
+	+ knex.schema.renameTable(\'91warehouses\'92, \'91new_warehouses\'92) -> Outputs: rename table `warehouses` to `new_warehouses`\
+\
+\
+- dropTable:\
+	+ knex.schema.dropTable(tableName)\
+	+ knex.schema.dropTable(\'91warehouses\'92) -> Outputs: drop table `warehouses`\
+\
+\
+-hasTable:\
+	+ knex.schema.hasTable(tableName)\
+	+\
+		knex.schema.withSchema(\'91test\'92).hasTable(\'91warehouses\'92).then(function(exists) \{\
+			if (!exists) \{\
+				return knex.schema.withSchema(\'91test\'92).createTable(\'91warehouses\'92, function(t) \{\
+					t.increments(\'91warehouse_id\'92).primary()\
+					t.string(\'91name\'92).notNullable().defaultTo('')\
+					t.string('phone').nullable()\
+					t.string('email').nullable()\
+					t.string('address').nullable()\
+					t.string('code').nullable()\
+					t.integer('sum_employee').nullable()\
+				\})\
+			\}\
+		\})\
+\
+\
+- hasColumn:\
+	+ knex.schema.hasColumn(tableName, columnName)\
+	+ knex.schema.hasColumn(\'91warehouses\'92, \'91quantity\'92)\
+\
+\
+- dropTableIfExists:\
+	+ knex.schema.dropTableIfExists(tableName)\
+	+ knex.schema.dropTableIfExists(\'91warehouses\'92) -> Outputs: drop table if exists `warehouses`\
+\
+\
+- table:\
+	+ knex.schema.table(tableName, callback)\
+	+\
+		knex.schema.table(\'91warehouses\'92, function (table) \{\
+			table.dropColumn(\'91quantity\'92)\
+			table.string(\'91manager_id\'92)\
+		\}) -> Outputs: alter table `warehouses` add `manager_id` varchar(255)\
+					alter table `warehouses` drop `quantity`\
+\
+\
+- dropColumn:\
+	+ table.dropColumn(\'91columnName\'92)\
+	+ example of table function\
+\
+\
+- dropColumns:\
+	+ table.dropColumns(*columnName)\
+	+\
+		knex.schema.table(\'91warehouses\'92, function (table) \{\
+			table.dropColumn(\'91code\'92, \'91manager_id\'92)\
+		\}) -> Outputs: alter table `warehouses` drop `code`, drop `manager_id`\
+\
+\
+- renameColumn:\
+	+ table.renameColumns(from, to)\
+	+\
+		knex.schema.table(\'91warehouses\'92, function (table) \{\
+			table.renameColumn(\'91phone\'92, \'91phone_number\'92)\
+		\})\
+\
+\
+- increments\
+	+ table.increments(name)\
+	+ \
+		knex.schema.createTable(\'91warehouses\'92, function(table)\{\
+			table.increments() //\'a0add an auto incrementing column with name is id, type: int, used as primary key\
+		\})\
+\
+		knex.schema.createTable(\'91warehouses\'92, function(table)\{\
+			table.increments(\'91warehouse_id\'92) //\'a0add an auto incrementing column with name is warehouse_id, type: int, used as primary key\
+		\})\
+\
+\
+- add a column:\
+	+ integer: table.integer(name)\
+		knex.schema.table(\'91warehouses\'92, function (table) \{\
+			table.integer(\'91testIntegerColumn\'92)\
+		\}) -> Outputs: alter table `warehouses` add `testIntegerColumn` int\
+\
+	+ bigInteger: table.bigInteger(name)\
+		knex.schema.table(\'91warehouses\'92, function (table) \{\
+			table.bigInteger(\'91testBigIntegerColumn\'92)\
+		\}) -> Outputs: alter table `warehouses` add `testBigIntegerColumn` bigint\
+\
+	+ text: table.text(name, [textType]), textType can be longtext, mediumtext, tinytext\
+		knex.schema.table(\'91warehouses\'92, function (table) \{\
+			table.text(\'91testTextColumn\'92)\
+		\}) -> Outputs: alter table `warehouses` add `testTextColumn` text\
+\
+		knex.schema.table(\'91warehouses\'92, function (table) \{\
+			table.text(\'91testMediumTextColumn\'92, \'91mediumtext\'92)\
+		\}) -> Outputs: alter table `warehouses` add `testMediumTextColumn` mediumtext\
+\
+	+ string: table.string(name, [length])\
+		knex.schema.table(\'91warehouses\'92, function (table) \{\
+			table.string(\'91testStringColumn\'92)\
+		\}) -> Outputs: alter table `warehouses` add `testStringColumn` varchar(255)\
+\
+	+ float: table.float(column, [precision], [scale])\
+		knex.schema.table(\'91warehouses\'92, function (table) \{\
+			table.float(\'91testFloatColumn\'92)\
+		\}) -> Outputs: alter table `warehouses` add `testFloatColumn` float(8, 2)\
+\
+	+ decimal: table.decimal(column, [precision], [scale])\
+		knex.schema.table(\'91warehouses\'92, function (table) \{\
+			table.decimal(\'91testDecimalColumn\'92)\
+		\}) -> Outputs: alter table `warehouses` add `testFloatColumn` decimal(8, 2)\
+\
+	+ boolean: table.boolean(name)\
+		knex.schema.table(\'91warehouses\'92, function (table) \{\
+			table.boolean(\'91testBooleanColumn\'92)\
+		\}) -> Outputs: alter table `warehouses` add `testBooleanColumn` boolean\
+\
+	+ date: table.date(name)\
+	+ dateTime: table.dateTime(name)\
+	+ time: table.time(name)\
+	+ timestamp: table.timestamp(name, [standard])\
+			   table.timestamp(\'91created_at\'92).defaulTo(knex.fn.now())\
+	+ timestamps: table.timestamps([useTimestamps], [defaultToNow])\
+\
+\
+\
+\
+\
+}
