@@ -9,11 +9,11 @@ var knex = require('knex')({
     }
   })
 
-  // var query = knex('warehouses').join('employees', 'warehouses.warehouse_id', 'employees.warehouse_id').join('contacts', 'employees.employee_id', 'contacts.employee_id')
-  // console.log(query.toSQL())
-  // return query.then(function(result){
-  //   console.log(result)
-  // })
+  var query = knex('warehouses').join('employees', 'warehouses.warehouse_id', 'employees.warehouse_id').join('contacts', 'employees.employee_id', 'contacts.employee_id')
+  console.log(query.toSQL())
+  return query.then(function(result){
+    console.log(result)
+  })
 
   // return knex.transaction(function(trx){
   //   return trx.insert({name: 'test'}).into('warehouses').returning('warehouse_id').then(function(warehouseId){
@@ -31,17 +31,17 @@ var knex = require('knex')({
   //   console.log('error all', err)
   // })
 
-  async function run(){
-    knex.transaction(async function(trx){
-      try{
-        let a = await trx.insert({name: 'test'}).into('warehouses').returning('warehouse_id')
-        console.log(a)
-        await trx.commit()
-      }catch(err){
-        await trx.rollback()
-      }
-    })
-  }
+  // async function run(){
+  //   knex.transaction(async function(trx){
+  //     try{
+  //       let a = await trx.insert({name: 'test'}).into('warehouses').returning('warehouse_id')
+  //       console.log(a)
+  //       await trx.commit()
+  //     }catch(err){
+  //       await trx.rollback()
+  //     }
+  //   })
+  // }
 
   // return knex.transaction(function(trx){
   //   return knex.insert({name: 'testDataWarehouse'}).into('warehouses').transacting(trx).then(function(warehouseId){
@@ -53,4 +53,4 @@ var knex = require('knex')({
   //   console.log('error', err)
   // })
 
-  run()
+  // run()
